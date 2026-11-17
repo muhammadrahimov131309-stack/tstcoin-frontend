@@ -1,162 +1,545 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSTCOIN Mini App</title>
-    <!-- Подключаем Tailwind CSS для крутого дизайна -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Подключаем Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>UNIVERSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:#07080f; --card:rgba(255,255,255,.045); --line:rgba(255,255,255,.09);
+  --txt:#eef1ff; --dim:#8a91b8;
+  --gold:#ffc63a; --pink:#ff4fa3; --violet:#8f6bff; --cyan:#38e1ff; --lime:#5dff9e;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Manrope',sans-serif;background:var(--bg);color:var(--txt);
+  overflow-x:hidden;user-select:none;
+}
+.mono{font-family:'JetBrains Mono',monospace}
+h1,h2,.brand,.lvl-chip,.btn{font-family:'Unbounded',sans-serif}
+
+/* ===== ФОН: город ===== */
+.sky{position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(120% 60% at 50% 100%, rgba(143,107,255,.20), transparent 60%),
+    radial-gradient(80% 40% at 15% 85%, rgba(56,225,255,.12), transparent 60%),
+    radial-gradient(80% 40% at 85% 80%, rgba(255,79,163,.10), transparent 60%),
+    var(--bg);
+}
+.stars{position:absolute;inset:0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 31% 9%, #fff 50%, transparent),
+    radial-gradient(1.5px 1.5px at 47% 22%, #ffd 50%, transparent),
+    radial-gradient(1px 1px at 66% 12%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 82% 26%, #fff 50%, transparent),
+    radial-gradient(1.5px 1.5px at 90% 8%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 22% 34%, #fff 50%, transparent),
+    radial-gradient(1px 1px at 74% 38%, #fff 50%, transparent);
+  opacity:.7;animation:twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes twinkle{from{opacity:.45}to{opacity:.85}}
+.skyline{position:absolute;bottom:0;left:0;width:100%;pointer-events:none}
+.skyline svg{display:block;width:100%}
+.sk1{opacity:.35}
+.sk2{opacity:.6}
+.win rect{opacity:.15;animation:blink 6s infinite}
+.win rect:nth-child(2n){animation-delay:1.4s}
+.win rect:nth-child(3n){animation-delay:2.8s}
+.win rect:nth-child(5n){animation-delay:4.1s}
+@keyframes blink{0%,88%{opacity:.15}92%{opacity:.85}100%{opacity:.15}}
+.glow-dot{position:absolute;width:3px;height:3px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.9),transparent 70%);
+  animation:rise 9s linear infinite;opacity:0}
+@keyframes rise{0%{transform:translateY(20vh);opacity:0}12%{opacity:.9}88%{opacity:.7}100%{transform:translateY(-90vh);opacity:0}}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 30%, transparent 55%, rgba(0,0,0,.55) 100%)}
+
+/* ===== каркас ===== */
+.wrap{position:relative;z-index:2;max-width:520px;margin:0 auto;padding:18px 16px 110px}
+.brand-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{font-size:15px;letter-spacing:3px;font-weight:800;
+  background:linear-gradient(90deg,var(--gold),var(--pink) 60%,var(--cyan));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.brand small{display:block;font-family:'Manrope';font-size:9px;letter-spacing:4px;color:var(--dim);-webkit-text-fill-color:var(--dim);margin-top:2px}
+.net{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:6px}
+.net i{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+
+/* ===== шапка профиля ===== */
+.hero{position:relative;border-radius:24px;padding:1px;
+  background:linear-gradient(135deg,rgba(255,198,58,.55),rgba(143,107,255,.35) 45%,rgba(56,225,255,.35));
+  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.hero-in{border-radius:23px;background:linear-gradient(160deg,rgba(20,22,40,.92),rgba(10,12,24,.92));
+  padding:18px;backdrop-filter:blur(14px)}
+.hero-top{display:flex;align-items:center;gap:14px}
+.avatar{position:relative;width:62px;height:62px;flex-shrink:0}
+.avatar::before{content:'';position:absolute;inset:-4px;border-radius:50%;
+  background:conic-gradient(var(--gold),var(--pink),var(--cyan),var(--gold));
+  animation:spin 4s linear infinite;filter:blur(.5px)}
+.avatar::after{content:'';position:absolute;inset:-1px;border-radius:50%;background:#0b0d18}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ava-core{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:26px;z-index:1;background:radial-gradient(circle at 30% 25%,#2a2f52,#12142a)}
+.hname{font-weight:800;font-size:17px}
+.hsub{font-size:11px;color:var(--dim);margin-top:2px}
+.lvl-chip{position:absolute;right:16px;top:16px;font-size:10px;font-weight:600;color:#12142a;
+  background:linear-gradient(135deg,var(--gold),#ffdf8a);padding:5px 10px;border-radius:99px;
+  box-shadow:0 0 18px rgba(255,198,58,.45)}
+.xp-wrap{margin-top:14px}
+.xp-label{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:6px;letter-spacing:1px}
+.xp-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.xp-fill{height:100%;width:38%;border-radius:99px;position:relative;
+  background:linear-gradient(90deg,var(--violet),var(--pink));
+  box-shadow:0 0 12px rgba(255,79,163,.6); transition: width 0.4s ease;}
+.hid{font-size:10px;color:var(--dim);margin-top:10px;letter-spacing:.5px}
+
+/* ===== баланс ===== */
+.balance{position:relative;margin-top:16px;border-radius:22px;padding:1px;
+  background:linear-gradient(135deg,rgba(255,198,58,.6),rgba(255,198,58,.08) 50%,rgba(255,79,163,.4));
+  box-shadow:0 18px 50px rgba(255,198,58,.12)}
+.balance-in{border-radius:21px;background:linear-gradient(160deg,rgba(28,22,8,.9),rgba(10,10,16,.92));
+  padding:20px 18px;text-align:center;overflow:hidden}
+.balance-in::before{content:'◆';position:absolute;font-size:120px;right:-18px;top:-26px;opacity:.07;color:var(--gold)}
+.balance-in .bl{font-size:10px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+.coin{display:inline-block;font-size:26px;margin:8px 0 2px;animation:coinFloat 2.6s ease-in-out infinite;
+  filter:drop-shadow(0 4px 14px rgba(255,198,58,.55))}
+@keyframes coinFloat{50%{transform:translateY(-5px) rotate(8deg)}}
+.amount{font-size:40px;font-weight:700;letter-spacing:1px;color:#fff;
+  text-shadow:0 0 24px rgba(255,198,58,.45)}
+.brow{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;border:none;cursor:pointer;padding:13px 0;border-radius:14px;font-size:12px;font-weight:600;
+  color:#12142a;position:relative;overflow:hidden;transition:transform .12s}
+.btn:active{transform:scale(.96)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#ffb02e);box-shadow:0 8px 24px rgba(255,198,58,.35)}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid var(--line)}
+
+/* ===== статус-плитки ===== */
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.stat{border-radius:16px;padding:13px 10px;text-align:center;background:var(--card);
+  border:1px solid var(--line);backdrop-filter:blur(10px)}
+.stat .ic{font-size:19px}
+.stat .v{font-weight:800;font-size:14px;margin-top:5px}
+.stat .k{font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase}
+.stat.rank .v{color:var(--cyan);text-shadow:0 0 10px rgba(56,225,255,.5)}
+.stat.gang .v{color:var(--pink);text-shadow:0 0 10px rgba(255,79,163,.5)}
+.stat.xp .v{color:var(--gold);text-shadow:0 0 10px rgba(255,198,58,.5)}
+
+/* ===== секции ===== */
+.sec{margin-top:22px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-head h2{font-size:13px;letter-spacing:2px;text-transform:uppercase}
+.sec-head h2 em{font-style:normal;margin-right:6px}
+.sec-head a{font-size:11px;color:var(--cyan);text-decoration:none;cursor:pointer}
+
+/* Скрытие / показ вкладок */
+.tab-content { display: none; }
+.tab-content.active-tab { display: block; }
+
+/* Магазин в стиле образца */
+.shop-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.shop-card { border-radius: 18px; padding: 16px; background: var(--card); border: 1px solid var(--line); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; }
+
+/* Инвентарь */
+.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{border-radius:14px;padding:1px;position:relative;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.item .strip{position:absolute;bottom:0;left:0;right:0;height:3px}
+.r1 .strip{background:var(--lime)} .r2 .strip{background:var(--cyan)}
+.r3 .strip{background:var(--violet);box-shadow:0 0 10px var(--violet)}
+.r4 .strip{background:linear-gradient(90deg,var(--gold),var(--pink),var(--gold));background-size:200% 100%;animation:wave 2s linear infinite}
+@keyframes wave{to{background-position:200% 0}}
+.item .em{font-size:24px;padding:12px 12px 4px}
+.item .nm{font-size:11px;font-weight:700;padding:0 12px 4px}
+.item .rr{font-size:9px;color:var(--dim);padding:0 12px 12px}
+
+/* Ежедневки */
+.dailies{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dcard{border-radius:18px;padding:16px;position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(10px)}
+.dcard.reward{border-color:rgba(255,198,58,.35)}
+.dcard.slot{border-color:rgba(143,107,255,.4)}
+.badge{position:absolute;top:10px;right:10px;font-size:8px;font-weight:800;letter-spacing:1px;padding:4px 8px;border-radius:99px}
+.badge.ready{background:rgba(93,255,158,.15);color:var(--lime);border:1px solid rgba(93,255,158,.4)}
+.badge.one{background:rgba(143,107,255,.18);color:var(--violet);border:1px solid rgba(143,107,255,.5)}
+.dtitle{font-size:11px;font-weight:800;letter-spacing:1px}
+.dsub{font-size:10px;color:var(--dim);margin-top:3px}
+.dbtn{margin-top:12px;width:100%;border:none;border-radius:10px;padding:9px 0;font-size:11px;font-weight:700;font-family:'Unbounded';cursor:pointer}
+.reward .dbtn{background:linear-gradient(135deg,var(--gold),#ffb02e);color:#12142a}
+.slot .dbtn{background:linear-gradient(135deg,var(--violet),#6a3bff);color:#fff}
+
+/* Казино блок */
+.casino-panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; text-align: center; backdrop-filter: blur(10px); }
+
+/* Лента событий */
+.feed{border-radius:18px;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(10px);overflow:hidden}
+.frow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+.frow:last-child{border-bottom:none}
+.frow .fi{font-size:18px;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);flex-shrink:0}
+.frow .ft{font-size:12px;line-height:1.45}
+.frow .ft b{color:var(--gold)}
+.frow .ftime{margin-left:auto;font-size:9px;color:var(--dim);flex-shrink:0}
+
+/* ===== таб-бар (точь-в-точь по ТЗ) ===== */
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:10;
+  max-width:520px;margin:0 auto;padding:10px 14px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(7,8,15,0),rgba(7,8,15,.92) 30%,rgba(7,8,15,.98))}
+.tab-pill{position:relative;display:grid;grid-template-columns:repeat(5,1fr);border-radius:20px;
+  background:rgba(16,18,34,.85);border:1px solid var(--line);backdrop-filter:blur(16px);
+  box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:11px 0;font-size:8.5px;color:var(--dim);cursor:pointer;letter-spacing:.5px;
+  transition:color .25s;z-index:2;border:none;background:none;font-family:'Manrope'}
+.tab .ti{font-size:19px;transition:transform .25s}
+.tab.active{color:var(--gold)}
+.tab.active .ti{transform:translateY(-3px) scale(1.12);filter:drop-shadow(0 0 10px rgba(255,198,58,.7))}
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none pb-20">
+<body>
 
-    <!-- ШАПКА -->
-    <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 p-4 sticky top-0 z-50 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center font-bold text-lg shadow-lg shadow-purple-500/30">T</div>
-            <div>
-                <h1 id="user-name" class="font-bold text-sm text-slate-200">Загрузка...</h1>
-                <span id="user-gang" class="text-xs text-indigo-400 font-medium">🏴 Банда: SHADOW</span>
-            </div>
+<div class="sky">
+  <div class="stars"></div>
+  <div class="glow-dot" style="left:12%;animation-delay:0s"></div>
+  <div class="glow-dot" style="left:35%;animation-delay:2.5s"></div>
+  <div class="glow-dot" style="left:58%;animation-delay:5s"></div>
+  <div class="skyline sk1">
+    <svg viewBox="0 0 400 120" preserveAspectRatio="none" fill="#0d1020">
+      <rect x="0" y="55" width="38" height="65"/><rect x="42" y="30" width="26" height="90"/>
+      <rect x="74" y="60" width="34" height="60"/><rect x="112" y="18" width="30" height="102"/>
+      <rect x="148" y="48" width="40" height="72"/><rect x="194" y="35" width="24" height="85"/>
+      <rect x="224" y="62" width="38" height="58"/><rect x="268" y="22" width="32" height="98"/>
+    </svg>
+  </div>
+</div>
+<div class="vignette"></div>
+
+<div class="wrap">
+
+  <div class="brand-row">
+    <div class="brand">UNIVERSE<small>STREET EMPIRE</small></div>
+    <div class="net"><i></i>ОНЛАЙН</div>
+  </div>
+
+  <!-- ВКЛАДКА 1: ГЛАВНАЯ (ТОЧЬ-В-ТОЧЬ ИЗ ТВОЕГО ПРИМЕРА) -->
+  <div id="tab-home" class="tab-content active-tab space-y-4">
+    <div class="hero">
+      <div class="hero-in">
+        <div class="hero-top">
+          <div class="avatar"><div class="ava-core">🕶️</div></div>
+          <div>
+            <div class="hname" id="pname">Боец</div>
+            <div class="hsub">Уличный боец • District 7</div>
+          </div>
+          <div class="lvl-chip" id="lvl-badge" style="position:static;margin-left:auto">LVL 1</div>
         </div>
-        <div class="bg-slate-950/60 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-inner">
-            <span class="text-amber-400 text-lg">🪙</span>
-            <span id="user-balance" class="font-extrabold text-amber-300 tracking-wide">0</span>
+        <div class="xp-wrap">
+          <div class="xp-label"><span>ОПЫТ</span><span class="mono"><span id="xp-val">380</span> / <span id="xp-max">1000</span> XP</span></div>
+          <div class="xp-bar"><div class="xp-fill" id="xp-fill-bar" style="width: 38%;"></div></div>
         </div>
-    </header>
+        <div class="hid">ID: <span class="mono" id="uid-val">7127705775</span> • В игре с 16.11.2026</div>
+      </div>
+    </div>
 
-    <!-- КОНТЕНТ -->
-    <main class="flex-1 p-4 max-w-md mx-auto w-full space-y-4">
-        
-        <!-- ГЛАВНАЯ ВКЛАДКА -->
-        <div id="tab-home" class="space-y-4">
-            <div class="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/30 rounded-2xl p-5 text-center shadow-xl">
-                <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Уровень <span id="user-level">1</span></span>
-                <h2 id="card-name" class="text-2xl font-black mt-1 text-white">Боец</h2>
-                <div class="mt-4 bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-700/50">
-                    <div id="xp-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-1/2 transition-all duration-500"></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="switchTab('casino')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-4 rounded-2xl text-left transition active:scale-95 shadow-md">
-                    <span class="text-2xl">🎰</span>
-                    <h3 class="font-bold text-sm mt-2 text-white">Казино</h3>
-                    <p class="text-xs text-slate-400">Умножай баланс</p>
-                </button>
-                <button onclick="switchTab('shop')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-4 rounded-2xl text-left transition active:scale-95 shadow-md">
-                    <span class="text-2xl">🛍️</span>
-                    <h3 class="font-bold text-sm mt-2 text-white">Магазин</h3>
-                    <p class="text-xs text-slate-400">Скины и тачки</p>
-                </button>
-            </div>
+    <!-- БАЛАНС -->
+    <div class="balance">
+      <div class="balance-in">
+        <div class="bl">Твой капитал</div>
+        <div><span class="coin">🪙</span></div>
+        <div class="amount mono" id="bal">0</div>
+        <div class="brow">
+          <button class="btn btn-gold" onclick="doEarn()">💼 Заработать (+100)</button>
+          <button class="btn btn-ghost" onclick="switchTabNav(2)">🎰 В казино</button>
         </div>
+      </div>
+    </div>
 
-        <!-- ВКЛАДКА КАЗИНО -->
-        <div id="tab-casino" class="space-y-4 hidden">
-            <h2 class="text-xl font-extrabold text-center text-amber-400">⚡ АПГРЕЙДЕР БАЛАНСА</h2>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-xl">
-                <label class="text-xs text-slate-400 font-medium">Сумма ставки (монет)</label>
-                <input type="number" id="bet-amount" value="100" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-indigo-500">
-                <div class="grid grid-cols-3 gap-2 pt-2">
-                    <button onclick="playCasino(1.5)" class="bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-bold text-sm">x1.5</button>
-                    <button onclick="playCasino(2.0)" class="bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold text-sm">x2.0</button>
-                    <button onclick="playCasino(5.0)" class="bg-amber-600 hover:bg-amber-500 py-3 rounded-xl font-bold text-sm">x5.0</button>
-                </div>
-                <div id="casino-msg" class="mt-4 p-3 rounded-xl text-center font-bold text-sm hidden"></div>
-            </div>
+    <!-- СТАТУСЫ -->
+    <div class="stats">
+      <div class="stat rank"><div class="ic">🏆</div><div class="v">#1</div><div class="k">Место в топе</div></div>
+      <div class="stat gang"><div class="ic">🛡️</div><div class="v" id="stat-gang">SHADOW</div><div class="k">Банда</div></div>
+      <div class="stat xp"><div class="ic">✨</div><div class="v" id="stat-per">38%</div><div class="k">До уровня</div></div>
+    </div>
+
+    <!-- ЕЖЕДНЕВКИ -->
+    <div class="sec">
+      <div class="sec-head"><h2><em>📅</em>Ежедневки</h2></div>
+      <div class="dailies">
+        <div class="dcard reward">
+          <div class="badge ready">ГОТОВО</div>
+          <div class="dtitle">🎁 Награда дня</div>
+          <div class="dsub">День 1 из 30</div>
+          <button class="dbtn" onclick="alert('Награда получена!')">Забрать</button>
         </div>
-
-        <!-- ВКЛАДКА МАГАЗИН -->
-        <div id="tab-shop" class="space-y-4 hidden">
-            <h2 class="text-xl font-extrabold text-center text-slate-100">🛒 МАГАЗИН</h2>
-            <div id="shop-list" class="space-y-3">
-                <!-- Товары подгрузятся сами -->
-            </div>
+        <div class="dcard slot">
+          <div class="badge one">1 КРУТ</div>
+          <div class="dtitle">🎰 Слот дня</div>
+          <div class="dsub">Бесплатный спин</div>
+          <button class="dbtn" onclick="switchTabNav(2)">Крутить</button>
         </div>
+      </div>
+    </div>
 
-    </main>
+    <!-- ИНВЕНТАРЬ -->
+    <div class="sec">
+      <div class="sec-head"><h2><em>🎒</em>Инвентарь</h2><a onclick="switchTabNav(1)">открыть всё →</a></div>
+      <div class="inv-grid">
+        <div class="item r3"><div class="em">🧥</div><div class="nm">Кожаная куртка</div><div class="rr">Эпик • 15 000</div><div class="strip"></div></div>
+        <div class="item r2"><div class="em">🚗</div><div class="nm">Лада «Стартовая»</div><div class="rr">Редкий • 25 000</div><div class="strip"></div></div>
+      </div>
+    </div>
 
-    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur border-t border-slate-800 py-3 px-6 flex justify-around items-center z-50">
-        <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 text-indigo-400">
-            <span class="text-xl">🏠</span><span class="text-[10px] font-semibold">Главная</span>
-        </button>
-        <button onclick="switchTab('casino')" class="flex flex-col items-center gap-1 text-slate-400">
-            <span class="text-xl">🎰</span><span class="text-[10px] font-semibold">Казино</span>
-        </button>
-        <button onclick="switchTab('shop')" class="flex flex-col items-center gap-1 text-slate-400">
-            <span class="text-xl">🛍️</span><span class="text-[10px] font-semibold">Магазин</span>
-        </button>
-    </nav>
+    <!-- ЛЕНТА -->
+    <div class="sec">
+      <div class="sec-head"><h2><em>📰</em>События города</h2></div>
+      <div class="feed">
+        <div class="frow"><div class="fi">🎉</div><div class="ft"><b>Крот87</b> сорвал джекпот в слотах: 250 000 монет</div><div class="ftime">2 мин</div></div>
+        <div class="frow"><div class="fi">🚗</div><div class="ft"><b>Тень_города</b> купил актив за 800 000</div><div class="ftime">18 мин</div></div>
+      </div>
+    </div>
+  </div>
 
-    <!-- СКРИПТ ЛОГИКИ -->
-    <script>const API_URL = "https://my-api-kiqr.onrender.com";
- // Ссылка на твой Render бэкенд
-        const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 7127705775;
+  <!-- ВКЛАДКА 2: МАГАЗИН -->
+  <div id="tab-shop" class="tab-content shop-grid space-y-4">
+    <div class="sec-head" style="margin-bottom:0"><h2><em>🛒</em>Магазин активов и бизнесов</h2></div>
+    <div id="shop-items-container" class="space-y-3">
+      <!-- Загружается из бэкенда -->
+    </div>
+  </div>
 
-        // Загрузка профиля
-        fetch(`${API_URL}/api/profile/${tgId}`)
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('user-name').innerText = data.nickname;
-                document.getElementById('card-name').innerText = data.nickname;
-                document.getElementById('user-balance').innerText = data.balance.toLocaleString();
-                document.getElementById('user-level').innerText = data.level;
-                document.getElementById('user-avatar').innerText = data.nickname[0].toUpperCase();
-                document.getElementById('user-gang').innerText = "🏴 Банда: " + data.gang;
-            });
+  <!-- ВКЛАДКА 3: КАЗИНО -->
+  <div id="tab-casino" class="tab-content space-y-4">
+    <div class="casino-panel space-y-3">
+      <h2>🎰 Казино: Краш и Рулетка</h2>
+      <p style="font-size:11px;color:var(--dim)">Испытай удачу и удвой свой баланс прямо сейчас!</p>
+      <div class="amount mono" id="casino-status" style="font-size:22px">Готов к игре</div>
+      <button class="btn btn-gold" onclick="playCasino(1000)" style="width:100%">Сделать ставку (1 000 🪙)</button>
+    </div>
+  </div>
 
-        // Загрузка магазина
-        fetch(`${API_URL}/api/магазин`)
-            .then(res => res.json())
-            .then(data => {
-                const list = document.getElementById('shop-list');
-                list.innerHTML = data.items.map(item => `
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center shadow-md">
-                        <div>
-                            <h3 class="font-bold text-white text-sm">${item.name}</h3>
-                            <span class="text-xs text-indigo-400 capitalize">Тип: ${item.type}</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-extrabold text-amber-400 block text-sm">🪙 ${item.price.toLocaleString()}</span>
-                            <button class="mt-1 bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-1.5 rounded-lg font-bold">Купить</button>
-                        </div>
-                    </div>
-                `).join('');
-            });
+  <!-- ВКЛАДКА 4: РАБОТА -->
+  <div id="tab-work" class="tab-content space-y-4">
+    <div class="casino-panel space-y-3">
+      <h2>💼 Уличный Майнинг & Работа</h2>
+      <p style="font-size:11px;color:var(--dim)">Пассивный доход империи капает каждую секунду.</p>
+      <div class="amount mono" id="passive-income" style="font-size:24px">+1,200 🪙/час</div>
+      <button class="btn btn-gold" onclick="alert('Доход успешно собран на баланс!')">Собрать прибыль</button>
+    </div>
+  </div>
 
-        // Переключение вкладок
-        function switchTab(tab) {
-            document.getElementById('tab-home').classList.add('hidden');
-            document.getElementById('tab-casino').classList.add('hidden');
-            document.getElementById('tab-shop').classList.add('hidden');
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        }
+  <!-- ВКЛАДКА 5: ТОП / АДМИНКА -->
+  <div id="tab-top" class="tab-content space-y-4">
+    <div class="casino-panel space-y-3">
+      <h2>🛡️ Админ-панель управления</h2>
+      <p style="font-size:11px;color:var(--dim)">Выдача средств через Supabase</p>
+      <input type="number" id="admin-add-amount" placeholder="Сумма (например: 50000)" style="width:100%;padding:12px;background:rgba(0,0,0,0.6);border:1px solid var(--line);border-radius:12px;color:#fff;text-align:center;font-family:'JetBrains Mono'">
+      <button class="btn btn-gold" onclick="adminGiveMoney()" style="width:100%">Начислить монеты</button>
+    </div>
+  </div>
 
-        // Игра в казино
-        function playCasino(mult) {
-            const bet = document.getElementById('bet-amount').value;
-            fetch(`${API_URL}/api/casino/upgrader`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ tg_id: tgId, amount: Number(bet), multiplier: mult })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const msg = document.getElementById('casino-msg');
-                msg.classList.remove('hidden');
-                if(data.detail) {
-                    msg.className = "mt-4 p-3 rounded-xl text-center font-bold text-sm bg-rose-950 border border-rose-500 text-rose-400";
-                    msg.innerText = data.detail;
-                } else {
-                    msg.className = data.win ? "mt-4 p-3 rounded-xl text-center font-bold text-sm bg-emerald-950 border border-emerald-500 text-emerald-400" : "mt-4 p-3 rounded-xl text-center font-bold text-sm bg-rose-950 border border-rose-500 text-rose-400";
-                    msg.innerText = data.win ? `🎉 Победа! Выиграно: +${data.payout}` : `😢 Проигрыш!`;
-                    document.getElementById('user-balance').innerText = data.new_balance.toLocaleString();
-                }
-            });
-        }
-    </script>
+</div>
+
+<!-- ТАБ-БАР (ТОЧЬ-В-ТОЧЬ ИЗ ПРИМЕРА) -->
+<div class="tabbar">
+  <div class="tab-pill">
+    <button class="tab active" onclick="switchTabNav(0)"><span class="ti">🏠</span>Главная</button>
+    <button class="tab" onclick="switchTabNav(1)"><span class="ti">🛒</span>Магазин</button>
+    <button class="tab" onclick="switchTabNav(2)"><span class="ti">🎰</span>Казино</button>
+    <button class="tab" onclick="switchTabNav(3)"><span class="ti">💼</span>Работа</button>
+    <button class="tab" onclick="switchTabNav(4)"><span class="ti">🏆</span>Топ</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://my-api-kiqr.onrender.com";
+let currentUser = {
+  tg_id: 7127705775,
+  nickname: "Боец",
+  balance: 10000,
+  level: 1,
+  xp: 380,
+  gang: "SHADOW",
+  income_per_hour: 1200,
+  inventory: []
+};
+
+// Подключаем Telegram WebApp
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) {
+  tg.expand();
+  tg.ready();
+  if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    currentUser.tg_id = tg.initDataUnsafe.user.id;
+    currentUser.nickname = tg.initDataUnsafe.user.first_name || "Боец";
+  }
+}
+
+// Авторизация на бэкенде Render + Supabase
+async function initUser() {
+  try {
+    const res = await fetch(`${API_URL}/api/auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tg_id: currentUser.tg_id, nickname: currentUser.nickname })
+    });
+    if (res.ok) {
+      currentUser = await res.json();
+    }
+  } catch (e) {
+    console.log("Бэкенд недоступен, работаем локально");
+  }
+  updateInterface();
+  loadShopItems();
+}
+
+function updateInterface() {
+  document.getElementById('pname').textContent = currentUser.nickname;
+  document.getElementById('bal').textContent = currentUser.balance.toLocaleString('ru-RU');
+  document.getElementById('lvl-badge').textContent = `LVL ${currentUser.level}`;
+  document.getElementById('uid-val').textContent = currentUser.tg_id;
+  document.getElementById('stat-gang').textContent = currentUser.gang || "SHADOW";
+  
+  const nextXp = currentUser.level * 1000;
+  document.getElementById('xp-val').textContent = currentUser.xp || 380;
+  document.getElementById('xp-max').textContent = nextXp;
+  const percent = Math.min(100, Math.round(((currentUser.xp || 380) / nextXp) * 100));
+  document.getElementById('xp-fill-bar').style.width = percent + '%';
+  document.getElementById('stat-per').textContent = percent + '%';
+}
+
+// Заработок (кликер)
+async function doEarn() {
+  try {
+    const res = await fetch(`${API_URL}/api/tap`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tg_id: currentUser.tg_id })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      currentUser.balance = data.balance;
+      currentUser.level = data.level;
+      currentUser.xp = data.xp;
+    } else {
+      currentUser.balance += 100;
+      currentUser.xp += 25;
+    }
+  } catch(e) {
+    currentUser.balance += 100;
+    currentUser.xp += 25;
+  }
+  updateInterface();
+}
+
+// Загрузка магазина с сервера
+async function loadShopItems() {
+  try {
+    const res = await fetch(`${API_URL}/api/shop`);
+    if(res.ok) {
+      const data = await res.json();
+      const container = document.getElementById('shop-items-container');
+      container.innerHTML = data.items.map(item => `
+        <div class="shop-card">
+          <div style="font-size:28px">${item.icon || '🏢'}</div>
+          <div style="flex:1; margin-left:12px;">
+            <h3 style="font-size:13px; font-weight:800;">${item.name}</h3>
+            <p style="font-size:10px; color:var(--dim); margin-top:2px;">Доход: +${item.income} монет/ч</p>
+          </div>
+          <button class="btn btn-gold" style="padding:10px 14px; font-size:10px;" onclick="buyItem(${item.id})">${item.price.toLocaleString()} 🪙</button>
+        </div>
+      `).join('');
+    }
+  } catch(e) {}
+}
+
+async function buyItem(id) {
+  try {
+    const res = await fetch(`${API_URL}/api/shop/buy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tg_id: currentUser.tg_id, item_id: id })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      currentUser.balance = data.balance;
+      currentUser.level = data.level;
+      currentUser.xp = data.xp;
+      updateInterface();
+      alert("Актив успешно приобретен!");
+    } else {
+      alert(data.detail || "Недостаточно средств");
+    }
+  } catch(e) {
+    alert("Ошибка соединения");
+  }
+}
+
+// Казино
+async function playCasino(amount) {
+  if(currentUser.balance < amount) {
+    alert("Недостаточно монет для ставки!");
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/api/casino/crash`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tg_id: currentUser.tg_id, amount: amount, multiplier: 2.0 })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      currentUser.balance = data.new_balance;
+      updateInterface();
+      document.getElementById('casino-status').textContent = data.win ? `Победа! Выигрыш x2.0` : `Проигрыш! Ставка сгорела`;
+    }
+  } catch(e) {
+    currentUser.balance -= amount;
+    updateInterface();
+    document.getElementById('casino-status').textContent = "Проигрыш в казино";
+  }
+}
+
+// Админка
+async function adminGiveMoney() {
+  const amt = parseInt(document.getElementById('admin-add-amount').value) || 50000;
+  try {
+    const res = await fetch(`${API_URL}/api/admin/give`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ admin_id: currentUser.tg_id, target_tg_id: currentUser.tg_id, amount: amt })
+    });
+    const data = await res.json();
+    if(res.ok) {
+      currentUser.balance = data.new_balance;
+      updateInterface();
+      alert("Успешно зачислено через Supabase!");
+    }
+  } catch(e) {
+    currentUser.balance += amt;
+    updateInterface();
+    alert("Начислено локально: +" + amt);
+  }
+}
+
+// Переключение вкладок
+function switchTabNav(index) {
+  const tabs = document.querySelectorAll('.tab-content');
+  const buttons = document.querySelectorAll('.tab-pill .tab');
+  
+  tabs.forEach((t, i) => {
+    if(i === index) t.classList.add('active-tab');
+    else t.classList.remove('active-tab');
+  });
+
+  buttons.forEach((b, i) => {
+    if(i === index) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+}
+
+// Запуск
+initUser();
+</script>
 </body>
 </html>
+
